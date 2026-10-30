@@ -29,6 +29,7 @@ body { background: var(--bg); color: var(--fg); font: 14px/1.45 var(--font); }
 .k-blue { background: linear-gradient(135deg, #1e6fff, #4b8dff); }
 .k-navy { background: linear-gradient(135deg, #12264a, #2a4f8f); }
 .k-amber { background: linear-gradient(135deg, #f79009, #fdb022); }
+.k-green { background: linear-gradient(135deg, #079455, #12b76a); }
 .av-klabel { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; opacity: .92; }
 .av-knum { font-size: 2.6rem; line-height: 1.05; font-weight: 800; }
 .av-ksub { font-size: .8rem; opacity: .92; }

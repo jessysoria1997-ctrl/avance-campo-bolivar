@@ -39,14 +39,15 @@
     const meta = Number(datos.meta) || 700;
     const fechas = [...new Set(enc.map((e) => e.fecha))].sort();
     const ultima = fechas[fechas.length - 1];
+    const diasCampo = Array.isArray(datos.dias_campo) && datos.dias_campo.length ? datos.dias_campo : fechas;
     const dias = [0, 1].map((i) => {
-      const fecha = fechas[i] || null;
+      const fecha = diasCampo[i] || null;
       const del = enc.filter((e) => fecha && e.fecha === fecha);
       return { fecha, total: del.length, porSup: SUPERVISORES.map((s) => del.filter((e) => e.supervisor === s.nombre).length) };
     });
     const porSup = SUPERVISORES.map((s) => {
       const suyas = enc.filter((e) => e.supervisor === s.nombre);
-      return { ...s, total: suyas.length, parte: enc.length ? suyas.length / enc.length : 0, d1: suyas.filter((e) => e.fecha === fechas[0]).length, d2: suyas.filter((e) => e.fecha === fechas[1]).length };
+      return { ...s, total: suyas.length, parte: enc.length ? suyas.length / enc.length : 0, d1: suyas.filter((e) => e.fecha === diasCampo[0]).length, d2: suyas.filter((e) => e.fecha === diasCampo[1]).length };
     });
     const parroquias = PARROQUIAS.map((p) => {
       const de = enc.filter((e) => e.parroquia === p);
@@ -62,7 +63,7 @@
       ];
     };
     const perfil = [...SUPERVISORES.map((s) => ({ nombre: s.nombre, v: grupo(enc.filter((e) => e.supervisor === s.nombre)) })), { nombre: 'Total', v: grupo(enc), total: true }];
-    return { total: enc.length, meta, faltan: Math.max(meta - enc.length, 0), avance: meta ? enc.length / meta : 0, ultimoDia: enc.filter((e) => e.fecha === ultima).length, dias, porSup, parroquias, perfil };
+    return { total: enc.length, meta, faltan: Math.max(meta - enc.length, 0), exceso: Math.max(enc.length - meta, 0), avance: meta ? enc.length / meta : 0, ultimoDia: enc.filter((e) => e.fecha === ultima).length, dias, porSup, parroquias, perfil };
   }
 
   function fila(celdas, clase) {
@@ -80,13 +81,18 @@
 
     numero($('k-realizadas'), c.total);
     numero($('k-meta'), c.meta);
-    numero($('k-faltan'), c.faltan);
+    const superada = c.total >= c.meta && c.meta > 0;
+    $('card-faltan').classList.toggle('k-amber', !superada);
+    $('card-faltan').classList.toggle('k-green', superada);
+    $('l-faltan').textContent = superada ? 'Meta superada' : 'Faltan';
+    $('s-faltan').textContent = superada ? 'encuestas por encima de la meta' : 'para llegar a la meta';
+    if (superada) { $('k-faltan').textContent = `+${c.exceso}`; } else { numero($('k-faltan'), c.faltan); }
     $('k-ultimo-dia').textContent = String(c.ultimoDia);
     $('k-avance').textContent = pct(c.avance);
     requestAnimationFrame(() => { $('g-bar').style.strokeDasharray = `${Math.min(c.avance, 1) * 100} 100`; });
 
     c.dias.forEach((d, i) => {
-      $(`d${i + 1}-fecha`).textContent = d.fecha ? fechaCorta(d.fecha) : 'Sin datos todavía';
+      $(`d${i + 1}-fecha`).textContent = d.fecha ? fechaCorta(d.fecha) : '—';
       numero($(`d${i + 1}-total`), d.total);
       const mix = $(`d${i + 1}-mix`);
       mix.replaceChildren();
