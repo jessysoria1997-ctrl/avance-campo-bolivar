@@ -8,6 +8,8 @@ Variables de entorno (en GitHub van como "Secrets" y "Variables"):
   KOBO_ASSET_UID  identificador del formulario, p. ej. aBcDeFgH123... (obligatorio)
   KOBO_URL        servidor de Kobo (por defecto https://kf.kobotoolbox.org)
   META            meta total de encuestas (por defecto 700)
+  DIAS_CAMPO      días de campo separados por coma (por defecto 2026-10-31,2026-11-01).
+                  Las encuestas anteriores al primer día (pruebas) no se cuentan.
 """
 import datetime as dt
 import json
@@ -71,6 +73,8 @@ def main():
     uid = os.environ.get("KOBO_ASSET_UID", "").strip()
     servidor = (os.environ.get("KOBO_URL") or "https://kf.kobotoolbox.org").strip().rstrip("/")
     meta = int(os.environ.get("META") or 700)
+    dias_campo = [d.strip() for d in (os.environ.get("DIAS_CAMPO") or "2026-10-31,2026-11-01").split(",") if d.strip()]
+    inicio = dias_campo[0]
     if not token or not uid:
         print("Faltan KOBO_TOKEN o KOBO_ASSET_UID: se mantiene el archivo de datos actual.")
         return 0
@@ -85,8 +89,8 @@ def main():
             continue  # encuestas rechazadas por el supervisor en Kobo
         enviado = hora_local(reg.get("_submission_time"))
         fecha = campo(reg, "fecha") or (enviado.date().isoformat() if enviado else None)
-        if not fecha:
-            continue
+        if not fecha or str(fecha)[:10] < inicio:
+            continue  # sin fecha o encuesta de prueba anterior al campo
         if enviado and (ultima is None or enviado > ultima):
             ultima = enviado
         sup = campo(reg, "supervisor") or ""
@@ -117,6 +121,7 @@ def main():
     salida = {
         "ejemplo": False,
         "meta": meta,
+        "dias_campo": dias_campo,
         "ultima_encuesta": ultima.isoformat(timespec="minutes") if ultima else None,
         "generado": dt.datetime.now(ECUADOR).isoformat(timespec="minutes"),
         "encuestas": encuestas,
