@@ -155,8 +155,8 @@
 
   function iniciarMapa(geo) {
     mapa = L.map('mapa', { scrollWheelZoom: false, zoomSnap: 0.25 });
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-      subdomains: 'abcd', maxZoom: 18, attribution: '© OpenStreetMap · © CARTO',
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19, attribution: '© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>',
     }).addTo(mapa);
     capaParroquias = L.geoJSON(geo, { style: { color: '#12264a', weight: 1.5, fillColor: '#dbe7ff', fillOpacity: 0.55 } }).addTo(mapa);
     geo.features.forEach((f) => centros.set(f.properties.parroquia, centroParroquia(f.geometry)));

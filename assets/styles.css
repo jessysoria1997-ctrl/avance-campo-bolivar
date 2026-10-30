@@ -66,6 +66,7 @@ body { background: var(--bg); color: var(--fg); font: 14px/1.45 var(--font); }
 
 .av-two { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); }
 .av-map { height: 360px; border-radius: 10px; overflow: hidden; border: 1px solid var(--line); background: #e8eef7; }
+.av-map .leaflet-tile-pane { filter: grayscale(1) brightness(1.08) contrast(.85); opacity: .85; }
 .av-pulso { position: relative; }
 .av-pulso .bola { position: absolute; inset: 0; border-radius: 50%; background: var(--blue); border: 2px solid #fff; color: #fff; font: 800 11px/1 var(--font); display: grid; place-items: center; box-shadow: 0 2px 6px rgba(16, 24, 40, .3); }
 .av-pulso .onda { position: absolute; inset: 0; border-radius: 50%; border: 2px solid var(--blue); animation: onda 2.4s ease-out infinite; }
