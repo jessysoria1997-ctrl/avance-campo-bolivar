@@ -8,7 +8,7 @@ Variables de entorno (en GitHub van como "Secrets" y "Variables"):
   KOBO_ASSET_UID  identificador del formulario, p. ej. aBcDeFgH123... (obligatorio)
   KOBO_URL        servidor de Kobo (por defecto https://kf.kobotoolbox.org)
   META            meta total de encuestas (por defecto 700)
-  DIAS_CAMPO      días de campo separados por coma (por defecto 2026-10-31,2026-11-01).
+  DIAS_CAMPO      días de campo separados por coma (por defecto 2026-11-14,2026-11-15).
                   Las encuestas anteriores al primer día (pruebas) no se cuentan.
 """
 import datetime as dt
@@ -73,7 +73,7 @@ def main():
     uid = os.environ.get("KOBO_ASSET_UID", "").strip()
     servidor = (os.environ.get("KOBO_URL") or "https://kf.kobotoolbox.org").strip().rstrip("/")
     meta = int(os.environ.get("META") or 700)
-    dias_campo = [d.strip() for d in (os.environ.get("DIAS_CAMPO") or "2026-10-31,2026-11-01").split(",") if d.strip()]
+    dias_campo = [d.strip() for d in (os.environ.get("DIAS_CAMPO") or "2026-11-14,2026-11-15").split(",") if d.strip()]
     inicio = dias_campo[0]
     if not token or not uid:
         print("Faltan KOBO_TOKEN o KOBO_ASSET_UID: se mantiene el archivo de datos actual.")
