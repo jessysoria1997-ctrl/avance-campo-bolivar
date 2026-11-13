@@ -24,7 +24,8 @@ SALIDA = os.path.join(RAIZ, "data", "encuestas.json")
 SUPERVISORES = {
     "marcela_sangucho": "Marcela Sangucho",
     "carina_flores": "Carina Flores",
-    "manolo_almagro": "Manolo Almagro",
+    "carla_andrade": "Carla Andrade",
+    "manolo_almagro": "Carla Andrade",  # formularios antiguos: Carla Andrade reemplaza a Manolo Almagro
 }
 PARROQUIAS = {
     "bolivar": "Bolívar (cabecera cantonal)",

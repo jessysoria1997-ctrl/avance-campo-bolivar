@@ -2,7 +2,7 @@
   const SUPERVISORES = [
     { nombre: 'Marcela Sangucho', color: '#8b5cf6' },
     { nombre: 'Carina Flores', color: '#06aed4' },
-    { nombre: 'Manolo Almagro', color: '#f97316' },
+    { nombre: 'Carla Andrade', color: '#f97316' },
   ];
   const PARROQUIAS = ['Bolívar (cabecera cantonal)', 'García Moreno', 'Los Andes', 'Monte Olivo', 'San Rafael', 'San Vicente de Pusir'];
   const MESES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
