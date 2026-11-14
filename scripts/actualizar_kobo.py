@@ -69,6 +69,30 @@ def hora_local(texto):
     return t.astimezone(ECUADOR)
 
 
+def fecha_encuesta(registro, enviado):
+    """Día de la encuesta en hora de Ecuador.
+
+    Usa la hora de inicio de la entrevista. No usa el campo 'fecha' (today) como
+    primera opción porque el formulario web de Kobo lo registra un día antes en
+    zonas horarias como la de Ecuador.
+    """
+    for nombre in ("inicio", "fin"):
+        valor = campo(registro, nombre)
+        if not valor:
+            continue
+        try:
+            t = dt.datetime.fromisoformat(str(valor).replace("Z", "+00:00"))
+        except ValueError:
+            continue
+        if t.tzinfo is None:
+            return t.date().isoformat()
+        return t.astimezone(ECUADOR).date().isoformat()
+    if enviado:
+        return enviado.date().isoformat()
+    valor = campo(registro, "fecha")
+    return str(valor)[:10] if valor else None
+
+
 def main():
     token = os.environ.get("KOBO_TOKEN", "").strip()
     uid = os.environ.get("KOBO_ASSET_UID", "").strip()
@@ -82,15 +106,19 @@ def main():
 
     registros = descargar(servidor, uid, token)
     encuestas, puntos, ultima = [], [], None
+    descartes = {"no vota en Bolívar (F1)": 0, "no aprobadas en Kobo": 0, "anteriores al campo o sin fecha": 0}
     for reg in registros:
         if campo(reg, "f1_vota_bolivar") != "si":
+            descartes["no vota en Bolívar (F1)"] += 1
             continue  # no elegible o entrevista terminada en el filtro
         estado = (reg.get("_validation_status") or {}).get("uid")
         if estado == "validation_status_not_approved":
+            descartes["no aprobadas en Kobo"] += 1
             continue  # encuestas rechazadas por el supervisor en Kobo
         enviado = hora_local(reg.get("_submission_time"))
-        fecha = campo(reg, "fecha") or (enviado.date().isoformat() if enviado else None)
+        fecha = fecha_encuesta(reg, enviado)
         if not fecha or str(fecha)[:10] < inicio:
+            descartes["anteriores al campo o sin fecha"] += 1
             continue  # sin fecha o encuesta de prueba anterior al campo
         if enviado and (ultima is None or enviado > ultima):
             ultima = enviado
@@ -132,6 +160,8 @@ def main():
     with open(SALIDA, "w", encoding="utf-8") as f:
         json.dump(salida, f, ensure_ascii=False, separators=(",", ":"))
     print(f"{len(encuestas)} encuestas válidas de {len(registros)} registros; {len(puntos)} con ubicación.")
+    print("Descartadas: " + ", ".join(f"{k}: {v}" for k, v in descartes.items()))
+    print(f"Días de campo: {', '.join(dias_campo)}")
     return 0
 
 
